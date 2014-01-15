@@ -182,7 +182,7 @@ module Remove_Link_Common
 
     root_dirs.inject([]) { |r, dir|
       r + (File.directory?(dir) ? Dir[File.join(dir, name)] : []) 
-    }.find_all { |path| File.directory?(path) }
+    }.find_all { |path| File.directory?(path) }.sort
   end
 
   def confirm
@@ -252,7 +252,7 @@ module List
     puts dir + ":"
     dirs = Dir[File.join(dir, name)]
     puts "  <no files>" if dirs.empty?
-    dirs.each do |path|
+    dirs.sort.each do |path|
       puts "  " + File.basename(path) if File.directory?(path)
     end
     puts "\n"
