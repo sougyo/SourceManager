@@ -259,6 +259,41 @@ module List
   end
 end
 
+module Follow
+
+  extend(self)
+
+  def exec(search_root)
+    expect File.directory?(search_root), "#{search_root} is not directory"
+    show_link(search_root, DEBUGINFO_DIR)
+    show_link(search_root, SRPM_DIR)
+  end
+
+  private
+
+  def show_link(search_root, source_root)
+    source_root_path = File.expand_path(source_root)
+
+    h = {}
+    Dir[File.join(search_root, "**/*")].each do |e|
+      next unless File.symlink?(e)
+
+      lpath = File.expand_path(File.readlink(e))
+      if lpath.index(source_root_path) == 0
+        h[lpath] ||= []
+        h[lpath] << e
+      end
+    end
+
+    puts source_root_path + ":"
+    h.sort_by { |k, v| v.length }.each do |k, v|
+      puts "  #{k.gsub(source_root_path + File::SEPARATOR, "")} <="
+      v.each { |e| puts "    #{e}" }
+      puts ""
+    end 
+  end
+end
+
 class Command
   attr_reader :name, :synopsis
 
@@ -296,6 +331,11 @@ class CommandList
     synopsis = "link <package name> [<destination directory>]"
     command_list << Command.new("link", synopsis, (1..2)) do |args|
       Link.exec(args[0], args[1])
+    end
+
+    synopsis = "follow <root directory>"
+    command_list << Command.new("follow", synopsis, (1..1)) do |args|
+      Follow.exec(args[0])
     end
 
     command_list
