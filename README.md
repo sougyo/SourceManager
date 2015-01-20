@@ -1,3 +1,5 @@
+#Source code manager for .debuginfo/.src.rpm
+
 ```
 alias smgr='/usr/bin/ruby /root/tool/SourceManager/smgr.rb'
 ```
